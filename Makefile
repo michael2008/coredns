@@ -1,7 +1,7 @@
 # Makefile for building CoreDNS
 GITCOMMIT:=$(shell git describe --dirty --always)
 BINARY:=coredns
-SYSTEM:=
+SYSTEM:=GOARCH=amd64 GOOS=linux
 CHECKS:=check
 BUILDOPTS:=-v
 GOPATH?=$(HOME)/go
