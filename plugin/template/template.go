@@ -5,6 +5,7 @@ import (
 	"context"
 	"regexp"
 	"strconv"
+	"strings"
 	gotmpl "text/template"
 
 	"github.com/coredns/coredns/plugin"
@@ -191,9 +192,20 @@ func (t template) match(ctx context.Context, state request.Request) (*templateDa
 		for i, m := range matches {
 			if len(groupNames[i]) > 0 {
 				data.Group[groupNames[i]] = m
+				// padding
+				s := m
+				for i := len(s); i < 3; i++ {
+					s = "0" + s
+				}
+				data.Group[groupNames[i]+"_pad"] = s
+				// trim leading zero
+				p := strings.TrimLeft(m, "0")
+				if p == "" {
+					p = "0"
+				}
+				data.Group[groupNames[i]+"_trim"] = p
 			}
 		}
-
 		return data, true, false
 	}
 
