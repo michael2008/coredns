@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/coredns/caddy"
 	"github.com/coredns/coredns/plugin/test"
 
-	"github.com/caddyserver/caddy"
 	"github.com/miekg/dns"
 )
 
@@ -140,6 +140,34 @@ func TestACLServeDNS(t *testing.T) {
 			args{
 				"www.example.org.",
 				"192.168.1.3",
+				dns.TypeA,
+			},
+			dns.RcodeSuccess,
+			false,
+		},
+		{
+			"Filter 1 FILTERED",
+			`acl example.org {
+				filter type A net 192.168.0.0/16
+			}`,
+			[]string{},
+			args{
+				"www.example.org.",
+				"192.168.0.2",
+				dns.TypeA,
+			},
+			dns.RcodeSuccess,
+			false,
+		},
+		{
+			"Filter 1 ALLOWED",
+			`acl example.org {
+				filter type A net 192.168.0.0/16
+			}`,
+			[]string{},
+			args{
+				"www.example.org.",
+				"192.167.0.2",
 				dns.TypeA,
 			},
 			dns.RcodeSuccess,

@@ -49,6 +49,7 @@ type templateData struct {
 	Type     string
 	Message  *dns.Msg
 	Question *dns.Question
+	Remote   string
 	md       map[string]metadata.Func
 }
 
@@ -146,7 +147,7 @@ func executeRRTemplate(server, section string, template *gotmpl.Template, data *
 
 func (t template) match(ctx context.Context, state request.Request) (*templateData, bool, bool) {
 	q := state.Req.Question[0]
-	data := &templateData{md: metadata.ValueFuncs(ctx)}
+	data := &templateData{md: metadata.ValueFuncs(ctx), Remote: state.IP()}
 
 	zone := plugin.Zones(t.zones).Matches(state.Name())
 	if zone == "" {

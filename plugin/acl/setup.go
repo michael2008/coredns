@@ -4,11 +4,10 @@ import (
 	"net"
 	"strings"
 
+	"github.com/coredns/caddy"
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
-	"github.com/coredns/coredns/plugin/metrics"
 
-	"github.com/caddyserver/caddy"
 	"github.com/infobloxopen/go-trees/iptree"
 	"github.com/miekg/dns"
 )
@@ -37,11 +36,6 @@ func setup(c *caddy.Controller) error {
 		return a
 	})
 
-	// Register all metrics.
-	c.OnStartup(func() error {
-		metrics.MustRegister(c, RequestBlockCount, RequestAllowCount)
-		return nil
-	})
 	return nil
 }
 
@@ -67,8 +61,10 @@ func parse(c *caddy.Controller) (ACL, error) {
 				p.action = actionAllow
 			} else if action == "block" {
 				p.action = actionBlock
+			} else if action == "filter" {
+				p.action = actionFilter
 			} else {
-				return a, c.Errf("unexpected token %q; expect 'allow' or 'block'", c.Val())
+				return a, c.Errf("unexpected token %q; expect 'allow', 'block', or 'filter'", c.Val())
 			}
 
 			p.qtypes = make(map[uint16]struct{})
